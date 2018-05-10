@@ -263,7 +263,7 @@ int maxNum(char board[N][N], char player) {
 }
 
 
-// The minimax algorithm will achieve the ultimate goal; the computer never loses
+// the computer never loses
 void minimax(char board[N][N], char player) {
     int i, j, max, mval_i, mval_j;
     max = -10;
