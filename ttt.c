@@ -57,7 +57,7 @@ int main() {
 }
 
 
-//Initialize-board
+// Initialize board
 void initialize(char board[N][N]) {
     int i, j;
     for (i = 0; i < N; ++i) {
