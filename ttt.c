@@ -69,11 +69,15 @@ int main() {
 void initialize(char board[N][N]) {
     int i, j;
     /*@
-	  @ loop invariant 0<=j<=i<=N;
-	  @ loop invariant \forall int i,j; 0<=j<i<N ==> board[i][j] == open_spot;
-	  @ loop assigns i,j;
+	  @ loop invariant 0<=i<=N;
+	  @ loop invariant \forall int i,j; 0<=j<i<N ==> board[i][j] == open_spot; //todo use hasValue to check for ' '
+	  @ loop assigns i;
 	  @*/
     for (i = 0; i < N; ++i) {
+		/*@
+		  @ loop invariant 0<=j<=N;
+		  @ loop assigns j;
+		  @*/
         for (j = 0; j < N; ++j) {
             board[i][j] = open_spot;
         }
@@ -206,7 +210,6 @@ int win_check(char board[N][N], char player) {
 }
 
 
-//split from win_check so it's easier to prove
 int tie_check(char board[N][N]){
     // Check for a tie
     int i, j;
