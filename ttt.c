@@ -17,6 +17,7 @@
 #define GAMETIE 0
 #define GAMELOSE -1
 #define INCOMPLETE 2
+
 #define N 3
 
 // **Functions**
@@ -60,8 +61,18 @@ int main() {
 
 
 // Initialize board
+
+/*@
+  @ requires \valid(board[0..(N-1)]+(0..2));
+  @ ensures \forall int i, j; 0<=j<i<2 ==> board[i][j] == open_spot;
+  @*/
 void initialize(char board[N][N]) {
     int i, j;
+    /*@
+	  @ loop invariant 0<=j<=i<=N;
+	  @ loop invariant \forall int i,j; 0<=j<i<N ==> board[i][j] == open_spot;
+	  @ loop assigns i,j;
+	  @*/
     for (i = 0; i < N; ++i) {
         for (j = 0; j < N; ++j) {
             board[i][j] = open_spot;
@@ -111,7 +122,7 @@ int player_turn(char board[N][N], char player) {
     int grid_var;
     while (TRUE) {
         //printf("Enter number: "); // Allows the user to pick a spot according to the diagram
-        scanf("%d", &grid_var);
+        //scanf("%d", &grid_var);
         //printf("\t\t\tPlayer's turn\n");
         if (gridTurn(board, player, grid_var) == 0) // If incorrect location is chosen, make user try again
             break;
