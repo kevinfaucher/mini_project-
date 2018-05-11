@@ -206,6 +206,7 @@ int win_check(char board[N][N], char player) {
 }
 
 
+//split from win_check so it's easier to prove
 int tie_check(char board[N][N]){
     // Check for a tie
     int i, j;
