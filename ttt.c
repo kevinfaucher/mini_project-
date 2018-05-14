@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdbool.h>
+//#include "HasValue.h"
 
 #define boxArea(box) (box >= 1 && box <= 9 ? TRUE : FALSE)
 #define validCoord(x, y) ((x < 0 || x > N-1 || y < 0 || y > N-1) ? FALSE : TRUE)
@@ -17,7 +18,7 @@
 #define GAMETIE 0
 #define GAMELOSE -1
 #define INCOMPLETE 2
-
+#define value_type char
 #define N 3
 
 // **Functions**
@@ -45,6 +46,21 @@ void minimax(char board[N][N], char player);
 
 bool end_game(int play);
 
+/*@
+  predicate
+  HasValue{A}(char* a, integer m, integer n) =
+  \exists integer i; m <= i < n && a[i] == ' ';
+
+  predicate
+  HasValue{A}(char* a, integer n) =
+  HasValue(a, 0, n);
+
+  predicate
+  HasValue2d{A}(char **a, integer n, integer m) =
+  \exists integer i; 0<=i<n && HasValue(a[i], m);
+*/
+
+
 int main() {
     
     char board[N][N];
@@ -64,19 +80,18 @@ int main() {
 
 /*@
   @ requires \valid(board[0..(N-1)]+(0..2));
-  @ ensures \forall int i, j; 0<=j<i<2 ==> board[i][j] == open_spot;
+  @ ensures \forall int i, j; board[i][j] == ' ';
   @*/
 void initialize(char board[N][N]) {
     int i, j;
     /*@
 	  @ loop invariant 0<=i<=N;
-	  @ loop invariant \forall int i,j; 0<=j<i<N ==> board[i][j] == open_spot; //todo use hasValue to check for ' '
-	  @ loop assigns i;
+	  @ loop assigns i, board;
 	  @*/
     for (i = 0; i < N; ++i) {
-		/*@
-		  @ loop invariant 0<=j<=N;
-		  @ loop assigns j;
+		/*@ loop invariant 0<=i<= N && 0<=j<=i;
+		  @ loop assigns j, board;
+		  @ // loop invariant HasValue(board, i);  todo: gives a type error but will be useful for the whole program when fixed.
 		  @*/
         for (j = 0; j < N; ++j) {
             board[i][j] = open_spot;
@@ -162,8 +177,21 @@ int gridTurn(char board[N][N], char player, int grid_var) {
     return FALSE;
 }
 
+
+/*@
+  @ behavior validCoord:
+  		assumes validCoord(x,y) == FALSE;
+		ensures \result == TRUE;
+  @ behavior emptyBox:
+  		assumes emptyBox(board[x][y]) == FALSE;
+		ensures \result == TRUE;
+  @ behavior return_false:
+  		assumes validCoord(x,y) == TRUE && emptyBox(board[x][y]) == TRUE;
+		ensures board[x][y] == player;
+		ensures \result == FALSE;
+  @*/
 int coordTurn(char board[N][N], char player, int x, int y) {
-    // Check if coordinates are valid
+    // Check if coordinates a
     if (validCoord(x, y) == FALSE) {
         return TRUE;
     }
@@ -210,6 +238,16 @@ int win_check(char board[N][N], char player) {
 }
 
 
+/*@
+    // todo: modify or make or find an existing predicate to test these loops
+  @ // behavior tie:
+	//	assumes i * j == 9;
+	//	ensures \result == GAMETIE;
+  @ // behavior incomplete:
+	// 	assumes i*j != 9;
+	//	ensures \result == INCOMPLETE;
+  @ ensures \result != -1;  //placeholder so frama-c doesn't complain about empty annotations
+  @*/
 int tie_check(char board[N][N]){
     // Check for a tie
     int i, j;
