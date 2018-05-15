@@ -174,6 +174,7 @@ int gridTurn(char board[N][N], char player, int grid_var) {
 	  @ ensures emptyBox(board[i][j]) == FALSE ==> TRUE;
 	  @ ensures grid_var < 4 ==> j == 0;
 	  @ ensures j == 1 ==> grid_var < 7;
+	  @ ensures j == 2 ==> grid_var < 10;
 	  @*/
     if (grid_var < 4) {
         j = 0;
