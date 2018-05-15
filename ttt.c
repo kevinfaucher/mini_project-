@@ -50,7 +50,7 @@ bool end_game(int play);
   predicate
   HasValue{A}(char* a, integer m, integer n) =
   \exists integer i; m <= i < n && a[i] == ' ';
-
+  
   predicate
   HasValue{A}(char* a, integer n) =
   HasValue(a, 0, n);
@@ -109,8 +109,16 @@ void print_board(char board[N][N]) {
 }
 
 /*@
-  @ requires \true;
   @ assigns \nothing;
+  @ behavior GameWin: 
+  		assumes play == GAMEWIN;
+		ensures \result == TRUE;
+  @ behavior GameTie:
+  		assumes play == GAMETIE;
+		ensures \result == TRUE;
+  @ behavior return_false:
+  		assumes play != GAMEWIN  && play != GAMETIE;
+		ensures \result == FALSE;
   @*/
 bool end_game(int play) {
     if (play == GAMEWIN) {
@@ -161,7 +169,7 @@ int gridTurn(char board[N][N], char player, int grid_var) {
     }
     //Calculates i, j coordinates on grid
     int i, j;
-	/*@ requires \true;
+	/*@ requires \valid_read(board[0..(N-1)]+(0..2));
 	  @ ensures j >= 0;
 	  @ ensures emptyBox(board[i][j]) == FALSE ==> TRUE;
 	  @ ensures grid_var < 4 ==> j == 0;
@@ -185,7 +193,7 @@ int gridTurn(char board[N][N], char player, int grid_var) {
 
 
 /*@
-  @ behavior validCoord:
+  @ behavior validCoord: 
   		assumes validCoord(x,y) == FALSE;
 		ensures \result == TRUE;
   @ behavior emptyBox:
@@ -244,7 +252,7 @@ int win_check(char board[N][N], char player) {
 }
 
 
-/*@
+/*@ 
     // todo: modify or make or find an existing predicate to test these loops
   @ // behavior tie:
 	//	assumes i * j == 9;
