@@ -161,6 +161,12 @@ int gridTurn(char board[N][N], char player, int grid_var) {
     }
     //Calculates i, j coordinates on grid
     int i, j;
+	/*@ requires \true;
+	  @ ensures j >= 0;
+	  @ ensures emptyBox(board[i][j]) == FALSE ==> TRUE;
+	  @ ensures grid_var < 4 ==> j == 0;
+	  @ ensures j == 1 ==> grid_var < 7;
+	  @*/
     if (grid_var < 4) {
         j = 0;
     } else if (grid_var < 7) {
