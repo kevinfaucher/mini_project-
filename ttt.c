@@ -86,12 +86,14 @@ void initialize(char board[N][N]) {
 	  @ loop invariant 0<=i<=N;
 	  @ loop invariant zeroed2d(board, i);
 	  @ loop assigns i, board[0.. (N-1) ][0..2];
+	  @ loop variant N-i;
 	  @*/
     for (int i = 0; i < N; ++i) {
         /*@ loop invariant 0<=i<= N && 0<=j<=N;
           @ loop invariant zeroed2d(board, i);
           @ loop invariant zeroed(&board[i][0],j);
           @ loop assigns j, board[0.. (N-1) ][0..2];
+	  @ loop variant N-j;
           @*/
         for (int j = 0; j < N; ++j) {
             board[i][j] = open_spot;
