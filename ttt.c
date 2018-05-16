@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -30,7 +29,7 @@ int comp_turn(char board[N][N], char player);
 
 int player_turn(char board[N][N], char player);
 
-int gridTurn(char board[N][N], char player, int grid_var);
+bool gridTurn(char board[N][N], char player, int grid_var);
 
 int coordTurn(char board[N][N], char player, int x, int y);
 
@@ -42,27 +41,25 @@ int minNum(char board[N][N], char player);
 
 int maxNum(char board[N][N], char player);
 
+int new_board_check(char board[N][N], char player, char new_board[N][N]);
+
 void minimax(char board[N][N], char player);
 
 bool end_game(int play);
 
 /*@
-  predicate
-  HasValue{A}(char* a, integer m, integer n) =
-  \exists integer i; m <= i < n && a[i] == ' ';
+  predicate zeroed(char *a, integer numCols) =
+  \forall int i; 0<=i<numCols ==> a[i] == ' ';
 
-  predicate
-  HasValue{A}(char* a, integer n) =
-  HasValue(a, 0, n);
+  predicate zeroed2d(char (*a)[N], integer numRows) =
+  \forall int i; 0<=i<numRows ==> zeroed(&a[i][0], N);
+ */
 
-  predicate
-  HasValue2d{A}(char **a, integer n, integer m) =
-  \exists integer i; 0<=i<n && HasValue(a[i], m);
-*/
-
+// predicate zeroed2d{A}(char **a, integer n, integer m) =
+// \forall int i; 0<=i<n ==> zeroed(a[i], m);
 
 int main() {
-    
+
     char board[N][N];
     initialize(board);
     print_board(board);
@@ -80,44 +77,54 @@ int main() {
 
 /*@
   @ requires \valid(board[0..(N-1)]+(0..2));
-  @ ensures \forall int i, j; board[i][j] == ' ';
+  @ assigns board[0.. (N-1) ][0..2];
+  @ ensures zeroed2d(board,N);
   @*/
 void initialize(char board[N][N]) {
-    int i, j;
     /*@
 	  @ loop invariant 0<=i<=N;
-	  @ loop assigns i, board;
+	  @ loop invariant zeroed2d(board, i);
+	  @ loop assigns i, board[0.. (N-1) ][0..2];
 	  @*/
-    for (i = 0; i < N; ++i) {
-		/*@ loop invariant 0<=i<= N && 0<=j<=i;
-		  @ loop assigns j, board;
-		  @ // loop invariant HasValue(board, i);  todo: gives a type error but will be useful for the whole program when fixed.
-		  @*/
-        for (j = 0; j < N; ++j) {
+    for (int i = 0; i < N; ++i) {
+        /*@ loop invariant 0<=i<= N && 0<=j<=N;
+          @ loop invariant zeroed2d(board, i);
+          @ loop invariant zeroed(&board[i][0],j);
+          @ loop assigns j, board[0.. (N-1) ][0..2];
+          @*/
+        for (int j = 0; j < N; ++j) {
             board[i][j] = open_spot;
         }
     }
 }
 
 void print_board(char board[N][N]) {
-    //printf("\n");
+    printf("\n");
     int i;
     for (i = 0; i < N; ++i) {
-        //printf("| %c | %c | %c |\n", board[0][i], board[1][i], board[2][i]);
+        printf("| %c | %c | %c |\n", board[0][i], board[1][i], board[2][i]);
     }
-    //printf("\n");
+    printf("\n");
 }
 
 /*@
-  @ requires \true;
   @ assigns \nothing;
+  @ behavior GameWin:
+  		assumes play == GAMEWIN;
+		ensures \result == TRUE;
+  @ behavior GameTie:
+  		assumes play == GAMETIE;
+		ensures \result == TRUE;
+  @ behavior return_false:
+  		assumes play != GAMEWIN  && play != GAMETIE;
+		ensures \result == FALSE;
   @*/
 bool end_game(int play) {
     if (play == GAMEWIN) {
-        //printf("\nWinner is: Computer\n");
+        printf("\nWinner is: Computer\n");
         return TRUE;
     } else if (play == GAMETIE) {
-        //printf("\nTie game\n");
+        printf("\nTie game\n");
         return TRUE;
     }
     return FALSE;
@@ -126,7 +133,7 @@ bool end_game(int play) {
 
 
 int comp_turn(char board[N][N], char player) {
-    //printf("\t\t\tComputer's turn\n");
+    printf("\t\t\tComputer's turn\n");
 
     minimax(board, player);
     print_board(board);
@@ -140,13 +147,13 @@ int comp_turn(char board[N][N], char player) {
 int player_turn(char board[N][N], char player) {
     int grid_var;
     while (TRUE) {
-        //printf("Enter number: "); // Allows the user to pick a spot according to the diagram
-        //scanf("%d", &grid_var);
-        //printf("\t\t\tPlayer's turn\n");
+        printf("Enter number: "); // Allows the user to pick a spot according to the diagram
+        scanf("%d", &grid_var);
+        printf("\t\t\tPlayer's turn\n");
         if (gridTurn(board, player, grid_var) == 0) // If incorrect location is chosen, make user try again
             break;
 
-        //printf("Wrong selection, try again\n");
+        printf("Wrong selection, try again\n");
     }
 
     print_board(board);
@@ -155,12 +162,23 @@ int player_turn(char board[N][N], char player) {
     return end_game(play);
 }
 
-int gridTurn(char board[N][N], char player, int grid_var) {
+bool gridTurn(char board[N][N], char player, int grid_var) {
     if (boxArea(grid_var) == FALSE) {
         return TRUE;
     }
     //Calculates i, j coordinates on grid
     int i, j;
+    /*@
+      @ ensures j >= 0;
+
+      @ behavior empty_box_false:
+          assumes emptyBox(board[i][j]) == FALSE;
+        //ensures \result == TRUE;
+
+      @ ensures grid_var < 4 ==> j == 0;
+      @ ensures j == 1 ==> grid_var < 7;
+      @ ensures j == 2 ==> grid_var < 10;
+      @*/
     if (grid_var < 4) {
         j = 0;
     } else if (grid_var < 7) {
@@ -189,6 +207,7 @@ int gridTurn(char board[N][N], char player, int grid_var) {
   		assumes validCoord(x,y) == TRUE && emptyBox(board[x][y]) == TRUE;
 		ensures board[x][y] == player;
 		ensures \result == FALSE;
+  complete behaviors validCoord, emptyBox, return_false;
   @*/
 int coordTurn(char board[N][N], char player, int x, int y) {
     // Check if coordinates a
@@ -204,9 +223,18 @@ int coordTurn(char board[N][N], char player, int x, int y) {
 }
 
 
+/*@
+  @ requires \valid(board[0..(N-1)]+(0..2));
+  @ assigns \nothing;
+  @*/
 int win_check(char board[N][N], char player) {
     int i, j;
     // For rows and columns
+
+    /*@
+      @ loop invariant win_check_loop: 0<= i <= N;
+      @ loop assigns i;
+      @*/
     for (i = 0; i < N; ++i) {
         // Row
         if (board[0][i] != open_spot) {
@@ -231,8 +259,8 @@ int win_check(char board[N][N], char player) {
     if (board[2][0] != open_spot && board[2][0] == board[1][1] && board[1][1] == board[0][2]) {
         return board[2][0] == player ? GAMEWIN : GAMELOSE;
     }
-	
-	// check for a tie
+
+    // check for a tie
     return tie_check(board);
 
 }
@@ -246,6 +274,7 @@ int win_check(char board[N][N], char player) {
   @ // behavior incomplete:
 	// 	assumes i*j != 9;
 	//	ensures \result == INCOMPLETE;
+
   @ ensures \result != -1;  //placeholder so frama-c doesn't complain about empty annotations
   @*/
 int tie_check(char board[N][N]){
@@ -262,7 +291,7 @@ int tie_check(char board[N][N]){
     // Tie
     if (i * j == 9)
         return GAMETIE;
-        
+
     // Incomplete board
     return INCOMPLETE;
 
@@ -288,7 +317,7 @@ int minNum(char board[N][N], char player) {
                 }
             }
             if (new_board[i][j] != ' ') {
-                //printf("minNum error\n");
+                printf("minNum error\n");
                 exit(0);
             }
             new_board[i][j] = player;
@@ -300,28 +329,33 @@ int minNum(char board[N][N], char player) {
     return min;
 }
 
-int maxNum(char board[N][N], char player) {
-    int result = win_check(board, player);
-    if (result != INCOMPLETE)
-        return result;
+/*@
+  @ requires \valid_read(board[0..(N-1)]+(0..2));
 
-    int i, j, max;
-    max = -10;
-    for (i = 0; i < N; ++i) {
-        for (j = 0; j < N; ++j) {
+  @*/
+int maxNum(char board[N][N], char player) {
+    int game_result = win_check(board, player);
+
+    /*@
+      @ assigns game_result;
+      @*/
+
+    if (game_result != INCOMPLETE)
+        return game_result;
+
+    int max = -10;
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
                 continue;
             char new_board[N][N];
-            int x, y;
-            for (x = 0; x < N; ++x) {
-                for (y = 0; y < N; ++y) {
-                    new_board[x][y] = board[x][y];
-                }
-            }
+            new_board_check( board, player, new_board);
+
             if (new_board[i][j] != ' ') {
-                //printf("maxNum error\n");
+                printf("maxNum error\n");
                 exit(0);
             }
+            new_board[i][j] = player;
             new_board[i][j] = player;
             int temp = minNum(new_board, OTHER(player));
             if (temp > max)
@@ -331,18 +365,41 @@ int maxNum(char board[N][N], char player) {
     return max;
 }
 
+int new_board_check(char board[N][N], char player, char new_board[N][N]){
+    for (int x = 0; x < N; ++x) {
+        for (int y = 0; y < N; ++y) {
+            new_board[x][y] = board[x][y];
+        }
+    }
+
+}
+/*@
+  @ requires \valid_read(board[0..(N-1)]+(0..2));
+  @*/
 
 void minimax(char board[N][N], char player) {
-    int i, j, max, mval_i, mval_j;
+    //@ assigns max, mval_i, mval_j;
+    int  max, mval_i, mval_j;
     max = -10;
-    for (i = 0; i < N; ++i) {
-        for (j = 0; j < N; ++j) {
+    /*@
+      @ loop invariant minimax_first_loop: 0<=i<=N;
+      @ loop assigns i;
+      @*/
+    for (int i = 0; i < N; ++i) {
+        /*@
+          @ loop invariant minimax_second_loop: 0<=i<=N && 0<=j<=N;
+          @ loop assigns j;
+          @*/
+        for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
                 continue;
             char new_board[N][N];
-            int a, b;
-            for (a = 0; a < N; ++a) {
-                for (b = 0; b < N; ++b) {
+            /*@
+              @ loop invariant minimax_second_loop: 0<=i<=N && 0<=j<=N && 0<=a<=N;
+              @ loop assigns a;
+              @*/
+            for (int a = 0; a < N; ++a) {
+                for (int b = 0; b < N; ++b) {
                     new_board[a][b] = board[a][b];
                 }
             }
@@ -356,7 +413,7 @@ void minimax(char board[N][N], char player) {
         }
     }
     if (coordTurn(board, player, mval_i, mval_j) == TRUE) {
-        //printf("Minimax error\n");
+        printf("Minimax error\n");
         exit(0);
     }
 }
