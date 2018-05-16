@@ -196,7 +196,6 @@ bool gridTurn(char board[N][N], char player, int grid_var) {
     return FALSE;
 }
 
-
 /*@
   @ behavior validCoord:
   		assumes validCoord(x,y) == FALSE;
@@ -309,18 +308,18 @@ int minNum(char board[N][N], char player) {
 
     int min;
     min = 10;
-    /*@
-      @ loop assigns i;
-      @*/
+	/*@
+	  @ loop assigns i;
+	  @*/
     for (int i = 0; i < N; ++i) {
-        /*@
-          @ loop assigns j, min;
-          @*/
+	  /*@
+	    @ loop assigns j, min;
+	    @*/
         for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
                 continue;
-            char new_board[N][N];
-            new_board_check( board, player, new_board);
+           char new_board[N][N];
+		   new_board_check( board, player, new_board);
             if (new_board[i][j] != ' ') {
                 //printf("minNum error\n");
                 exit(0);
@@ -348,15 +347,15 @@ int maxNum(char board[N][N], char player) {
         return game_result;
 
     int max = -10;
-    /*@
-      @ loop invariant 0<=i<=N;
-      @ loop assigns i;
-      @*/
+	/*@
+	  @ loop invariant 0<=i<=N;
+	  @ loop assigns i;
+	  @*/
     for (int i = 0; i < N; ++i) {
-        /*@
-          @ loop invariant 0<=i<=N && 0<=j<=N;
-          @ loop assigns j, max;
-          @*/
+		/*@
+		  @ loop invariant 0<=i<=N && 0<=j<=N;
+	      @ loop assigns j, max;
+	      @*/
         for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
                 continue;
@@ -383,15 +382,15 @@ int maxNum(char board[N][N], char player) {
   @ ensures \forall int i,j; 0<=j<=i<=N ==> new_board[i][j] == board[i][j];
   @*/
 int new_board_check(char board[N][N], char player, char new_board[N][N]){
-    /*@
-      @ loop invariant 0<=x<=N;
-      @ loop assigns x;
-      @*/
+	/*@
+	  @ loop invariant 0<=x<=N;
+	  @ loop assigns x;
+	  @*/
     for (int x = 0; x < N; ++x) {
-        /*@
-          @ loop invariant 0<=x<=N && 0<=y<=N;
-          @ loop assigns y, new_board[0.. (N-1) ][0..2];
-          @*/
+		/*@
+		  @ loop invariant 0<=x<=N && 0<=y<=N;
+		  @ loop assigns y, new_board[0.. (N-1) ][0..2]; 
+		  @*/ 
         for (int y = 0; y < N; ++y) {
             new_board[x][y] = board[x][y];
         }
@@ -413,17 +412,19 @@ void minimax(char board[N][N], char player) {
     /*@
       @ loop invariant minimax_first_loop: 0<=i<=N;
       @ loop assigns i;
+	  @ loop variant N-i;
       @*/
     for (int i = 0; i < N; ++i) {
         /*@
           @ loop invariant minimax_second_loop: 0<=i<=N && 0<=j<=N;
           @ loop assigns j;
+		  @ loop variant N-j;
           @*/
         for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
                 continue;
             char new_board[N][N];
-            new_board_check( board, player, new_board);
+			new_board_check( board, player, new_board);
             new_board[i][j] = player;
             int temp = minNum(new_board, OTHER(player)); // Computer is at top of tree
             if (temp > max) { // Finish with the highest outcome of minNum loop
