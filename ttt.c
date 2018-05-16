@@ -352,6 +352,7 @@ int minNum(char board[N][N], char player) {
 
 /*@
   @ requires \valid_read(board[0..(N-1)]+(0..2));
+  @ ensures \result != INCOMPLETE;
   @*/
 int maxNum(char board[N][N], char player) {
     int game_result = win_check(board, player);
@@ -430,13 +431,13 @@ void minimax(char board[N][N], char player) {
     //@ assigns max, mval_i, mval_j;
     int  max, mval_i, mval_j;
     max = -10;
-    /*@
+    /*@ loop invariant 0 <= i <= N;
       @ loop invariant minimax_first_loop: 0<=i<=N;
       @ loop assigns i;
 	  @ loop variant N-i;
       @*/
     for (int i = 0; i < N; ++i) {
-        /*@
+        /*@ loop invariant 0 <= j <= N;
           @ loop invariant minimax_second_loop: 0<=i<=N && 0<=j<=N;
           @ loop assigns j;
 		  @ loop variant N-j;
