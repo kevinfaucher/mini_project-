@@ -209,6 +209,7 @@ bool gridTurn(char board[N][N], char player, int grid_var) {
 		ensures \result == FALSE;
   complete behaviors validCoord, emptyBox, return_false;
   @*/
+
 int coordTurn(char board[N][N], char player, int x, int y) {
     // Check if coordinates a
     if (validCoord(x, y) == FALSE) {
