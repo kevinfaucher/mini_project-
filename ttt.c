@@ -169,15 +169,13 @@ bool gridTurn(char board[N][N], char player, int grid_var) {
     }
     //Calculates i, j coordinates on grid
     int i, j;
-    /*@
-      @ ensures j >= 0;
-      @ behavior empty_box_false:
-          assumes emptyBox(board[i][j]) == FALSE;
-        //ensures \result == TRUE;
-      @ ensures grid_var < 4 ==> j == 0;
-      @ ensures j == 1 ==> grid_var < 7;
-      @ ensures j == 2 ==> grid_var < 10;
-      @*/
+	/*@ requires \valid_read(board[0..(N-1)]+(0..2));
+	  @ ensures j >= 0;
+	  @ ensures emptyBox(board[i][j]) == FALSE ==> TRUE;
+	  @ ensures grid_var < 4 ==> j == 0;
+	  @ ensures j == 1 ==> grid_var < 7;
+	  @ ensures j == 2 ==> grid_var < 10;
+	  @*/
     if (grid_var < 4) {
         j = 0;
     } else if (grid_var < 7) {
@@ -186,6 +184,10 @@ bool gridTurn(char board[N][N], char player, int grid_var) {
         j = 2;
     }
     i = grid_var - 1 - (j * N);
+	/*@
+	  @ ensures i == grid_var-1-(j*N);
+	  @ ensures \forall integer i, j; emptyBox(board[i][j]) == FALSE ==> TRUE;
+	  @*/
     if (emptyBox(board[i][j]) == FALSE) {
         return TRUE;
     }
