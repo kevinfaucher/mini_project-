@@ -196,7 +196,6 @@ bool gridTurn(char board[N][N], char player, int grid_var) {
     return FALSE;
 }
 
-
 /*@
   @ behavior validCoord:
   		assumes validCoord(x,y) == FALSE;
@@ -223,7 +222,6 @@ int coordTurn(char board[N][N], char player, int x, int y) {
 
     return FALSE;
 }
-
 
 /*@
   @ requires \valid(board[0..(N-1)]+(0..2));
