@@ -187,6 +187,10 @@ bool gridTurn(char board[N][N], char player, int grid_var) {
         j = 2;
     }
     i = grid_var - 1 - (j * N);
+	/*@ 
+	  @ ensures i == grid_var-1-(j*N);
+	  @ ensures \forall integer i, j; emptyBox(board[i][j]) == FALSE ==> TRUE;
+	  @*/
     if (emptyBox(board[i][j]) == FALSE) {
         return TRUE;
     }
@@ -385,11 +389,13 @@ void minimax(char board[N][N], char player) {
     /*@
       @ loop invariant minimax_first_loop: 0<=i<=N;
       @ loop assigns i;
+      @ loop variant N-i;
       @*/
     for (int i = 0; i < N; ++i) {
         /*@
           @ loop invariant minimax_second_loop: 0<=i<=N && 0<=j<=N;
           @ loop assigns j;
+	  @ loop variant N-j;
           @*/
         for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
