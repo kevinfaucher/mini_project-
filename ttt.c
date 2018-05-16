@@ -50,7 +50,6 @@ bool end_game(int play);
 /*@
   predicate zeroed(char *a, integer numCols) =
   \forall int i; 0<=i<numCols ==> a[i] == ' ';
-
   predicate zeroed2d(char (*a)[N], integer numRows) =
   \forall int i; 0<=i<numRows ==> zeroed(&a[i][0], N);
  */
@@ -170,11 +169,9 @@ bool gridTurn(char board[N][N], char player, int grid_var) {
     int i, j;
     /*@
       @ ensures j >= 0;
-
       @ behavior empty_box_false:
           assumes emptyBox(board[i][j]) == FALSE;
         //ensures \result == TRUE;
-
       @ ensures grid_var < 4 ==> j == 0;
       @ ensures j == 1 ==> grid_var < 7;
       @ ensures j == 2 ==> grid_var < 10;
@@ -279,7 +276,6 @@ int win_check(char board[N][N], char player) {
   @ // behavior incomplete:
 	// 	assumes i*j != 9;
 	//	ensures \result == INCOMPLETE;
-
   @ ensures \result != -1;  //placeholder so frama-c doesn't complain about empty annotations
   @*/
 int tie_check(char board[N][N]){
@@ -302,25 +298,29 @@ int tie_check(char board[N][N]){
 
 }
 
+/*@
+  @ requires \valid(board[0..(N-1)]+(0..2));
+  @*/
 
 int minNum(char board[N][N], char player) {
     int result = win_check(board, OTHER(player));
     if (result != INCOMPLETE)
         return result;
 
-    int i, j, min;
+    int min;
     min = 10;
-    for (i = 0; i < N; ++i) {
-        for (j = 0; j < N; ++j) {
+    /*@
+      @ loop assigns i;
+      @*/
+    for (int i = 0; i < N; ++i) {
+        /*@
+          @ loop assigns j, min;
+          @*/
+        for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
                 continue;
             char new_board[N][N];
-            int x, y;
-            for (x = 0; x < N; ++x) {
-                for (y = 0; y < N; ++y) {
-                    new_board[x][y] = board[x][y];
-                }
-            }
+            new_board_check( board, player, new_board);
             if (new_board[i][j] != ' ') {
                 //printf("minNum error\n");
                 exit(0);
@@ -336,7 +336,6 @@ int minNum(char board[N][N], char player) {
 
 /*@
   @ requires \valid_read(board[0..(N-1)]+(0..2));
-
   @*/
 int maxNum(char board[N][N], char player) {
     int game_result = win_check(board, player);
@@ -349,7 +348,15 @@ int maxNum(char board[N][N], char player) {
         return game_result;
 
     int max = -10;
+    /*@
+      @ loop invariant 0<=i<=N;
+      @ loop assigns i;
+      @*/
     for (int i = 0; i < N; ++i) {
+        /*@
+          @ loop invariant 0<=i<=N && 0<=j<=N;
+          @ loop assigns j, max;
+          @*/
         for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
                 continue;
@@ -370,14 +377,31 @@ int maxNum(char board[N][N], char player) {
     return max;
 }
 
+/*@
+  @ requires \valid(new_board[0..(N-1)]+(0..2));
+  @ assigns new_board[0.. (N-1) ][0..2];
+  @ ensures \forall int i,j; 0<=j<=i<=N ==> new_board[i][j] == board[i][j];
+  @*/
 int new_board_check(char board[N][N], char player, char new_board[N][N]){
+    /*@
+      @ loop invariant 0<=x<=N;
+      @ loop assigns x;
+      @*/
     for (int x = 0; x < N; ++x) {
+        /*@
+          @ loop invariant 0<=x<=N && 0<=y<=N;
+          @ loop assigns y, new_board[0.. (N-1) ][0..2];
+          @*/
         for (int y = 0; y < N; ++y) {
             new_board[x][y] = board[x][y];
         }
     }
 
 }
+
+
+
+
 /*@
   @ requires \valid_read(board[0..(N-1)]+(0..2));
   @*/
@@ -389,27 +413,17 @@ void minimax(char board[N][N], char player) {
     /*@
       @ loop invariant minimax_first_loop: 0<=i<=N;
       @ loop assigns i;
-      @ loop variant N-i;
       @*/
     for (int i = 0; i < N; ++i) {
         /*@
           @ loop invariant minimax_second_loop: 0<=i<=N && 0<=j<=N;
           @ loop assigns j;
-	  @ loop variant N-j;
           @*/
         for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
                 continue;
             char new_board[N][N];
-            /*@
-              @ loop invariant minimax_second_loop: 0<=i<=N && 0<=j<=N && 0<=a<=N;
-              @ loop assigns a;
-              @*/
-            for (int a = 0; a < N; ++a) {
-                for (int b = 0; b < N; ++b) {
-                    new_board[a][b] = board[a][b];
-                }
-            }
+            new_board_check( board, player, new_board);
             new_board[i][j] = player;
             int temp = minNum(new_board, OTHER(player)); // Computer is at top of tree
             if (temp > max) { // Finish with the highest outcome of minNum loop
