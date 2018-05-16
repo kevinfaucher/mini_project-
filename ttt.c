@@ -99,12 +99,12 @@ void initialize(char board[N][N]) {
 }
 
 void print_board(char board[N][N]) {
-    printf("\n");
+    //printf("\n");
     int i;
     for (i = 0; i < N; ++i) {
-        printf("| %c | %c | %c |\n", board[0][i], board[1][i], board[2][i]);
+        //printf("| %c | %c | %c |\n", board[0][i], board[1][i], board[2][i]);
     }
-    printf("\n");
+    //printf("\n");
 }
 
 /*@
@@ -121,10 +121,10 @@ void print_board(char board[N][N]) {
   @*/
 bool end_game(int play) {
     if (play == GAMEWIN) {
-        printf("\nWinner is: Computer\n");
+        //printf("\nWinner is: Computer\n");
         return TRUE;
     } else if (play == GAMETIE) {
-        printf("\nTie game\n");
+        //printf("\nTie game\n");
         return TRUE;
     }
     return FALSE;
@@ -133,7 +133,7 @@ bool end_game(int play) {
 
 
 int comp_turn(char board[N][N], char player) {
-    printf("\t\t\tComputer's turn\n");
+    //printf("\t\t\tComputer's turn\n");
 
     minimax(board, player);
     print_board(board);
@@ -147,13 +147,13 @@ int comp_turn(char board[N][N], char player) {
 int player_turn(char board[N][N], char player) {
     int grid_var;
     while (TRUE) {
-        printf("Enter number: "); // Allows the user to pick a spot according to the diagram
-        scanf("%d", &grid_var);
-        printf("\t\t\tPlayer's turn\n");
+        //printf("Enter number: "); // Allows the user to pick a spot according to the diagram
+        //scanf("%d", &grid_var);
+        //printf("\t\t\tPlayer's turn\n");
         if (gridTurn(board, player, grid_var) == 0) // If incorrect location is chosen, make user try again
             break;
 
-        printf("Wrong selection, try again\n");
+        //printf("Wrong selection, try again\n");
     }
 
     print_board(board);
@@ -318,7 +318,7 @@ int minNum(char board[N][N], char player) {
                 }
             }
             if (new_board[i][j] != ' ') {
-                printf("minNum error\n");
+                //printf("minNum error\n");
                 exit(0);
             }
             new_board[i][j] = player;
@@ -353,7 +353,7 @@ int maxNum(char board[N][N], char player) {
             new_board_check( board, player, new_board);
 
             if (new_board[i][j] != ' ') {
-                printf("maxNum error\n");
+                //printf("maxNum error\n");
                 exit(0);
             }
             new_board[i][j] = player;
@@ -414,7 +414,7 @@ void minimax(char board[N][N], char player) {
         }
     }
     if (coordTurn(board, player, mval_i, mval_j) == TRUE) {
-        printf("Minimax error\n");
+        //printf("Minimax error\n");
         exit(0);
     }
 }
