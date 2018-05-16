@@ -235,6 +235,7 @@ int win_check(char board[N][N], char player) {
     /*@
       @ loop invariant win_check_loop: 0<= i <= N;
       @ loop assigns i;
+      @ loop variant N-i;
       @*/
     for (i = 0; i < N; ++i) {
         // Row
@@ -310,10 +311,12 @@ int minNum(char board[N][N], char player) {
     min = 10;
 	/*@
 	  @ loop assigns i;
+	  @ loop variant N-i;
 	  @*/
     for (int i = 0; i < N; ++i) {
 	  /*@
 	    @ loop assigns j, min;
+	    @ loop variant N-j;
 	    @*/
         for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
@@ -350,11 +353,13 @@ int maxNum(char board[N][N], char player) {
 	/*@
 	  @ loop invariant 0<=i<=N;
 	  @ loop assigns i;
+	  @ loop variant N-i;
 	  @*/
     for (int i = 0; i < N; ++i) {
 		/*@
 		  @ loop invariant 0<=i<=N && 0<=j<=N;
 	      @ loop assigns j, max;
+	      @ loop variant N-j;
 	      @*/
         for (int j = 0; j < N; ++j) {
             if (board[i][j] != ' ')
@@ -385,11 +390,13 @@ int new_board_check(char board[N][N], char player, char new_board[N][N]){
 	/*@
 	  @ loop invariant 0<=x<=N;
 	  @ loop assigns x;
+	  @ loop variant N-x;
 	  @*/
     for (int x = 0; x < N; ++x) {
 		/*@
 		  @ loop invariant 0<=x<=N && 0<=y<=N;
 		  @ loop assigns y, new_board[0.. (N-1) ][0..2]; 
+		  @ loop variant N-y;
 		  @*/ 
         for (int y = 0; y < N; ++y) {
             new_board[x][y] = board[x][y];
