@@ -101,9 +101,16 @@ void initialize(char board[N][N]) {
     }
 }
 
+/*@ requires \valid(board[0..(N-1)]+(0..2));
+  @ assigns board[0..(N-1)][0..2];
+  @*/
 void print_board(char board[N][N]) {
     //printf("\n");
     int i;
+    /*@ loop invariant 0<=i<=N; 
+      @ loop assigns i, board[0.. (N-1)][0..2];
+      @ loop variant N-i;
+      @*/
     for (i = 0; i < N; ++i) {
         //printf("| %c | %c | %c |\n", board[0][i], board[1][i], board[2][i]);
     }
