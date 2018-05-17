@@ -265,6 +265,25 @@ int win_check(char board[N][N], char player) {
 
 }
 
+
+/*@
+  @ requires \valid_read(board[0..(N-1)]+(0..2));
+  @ assigns \nothing;
+  @ behavior left_true:
+  		assumes board[0][0] != open_spot && board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] == player;
+		ensures \result == GAMEWIN;
+  @ behavior right_true:
+  		assumes board[0][0] != open_spot && board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != player;
+		ensures \result == GAMELOSE;
+  @ behavior left_false:
+  		assumes board[2][0] != open_spot && board[2][0] == board[1][1] && board[1][1] == board[0][2] && board[2][0] == player;
+		ensures \result == GAMEWIN;
+  @ behavior right_false:
+  		assumes board[2][0] != open_spot && board[2][0] == board[1][1] && board[1][1] == board[0][2] && board[2][0] != player;
+		ensures \result == GAMELOSE;
+
+  @*/
+
 int diag_check(char board[N][N], char player){
 
     // Check left diagonal
@@ -280,7 +299,6 @@ int diag_check(char board[N][N], char player){
     return FALSE;
 
 }
-
 
 /*@
     // todo: modify or make or find an existing predicate to test these loops
