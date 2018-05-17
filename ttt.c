@@ -317,12 +317,14 @@ int tie_check(char board[N][N]){
 	/*@
 	  @ loop invariant 0<=i<=N;
 	  @ loop assigns i, j;
+	  @ loop variant N-i;
 	  @*/
     for (i = 0; i < N; i++) {
 	  /*@
 	  	@ loop invariant 0<=i<=N && 0<=j<=N;
 		@ loop invariant \forall int i,j; 0<=j<i ==> board[i][j] != ' ';
 		@ loop assigns j;
+		@ loop variant N-j;
 	  	@*/
         for ( j = 0; j < N; j++) {
             if (board[i][j] == open_spot)
