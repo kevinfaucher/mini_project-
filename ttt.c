@@ -314,6 +314,7 @@ int tie_check(char board[N][N]){
 
 /*@
   @ requires \valid(board[0..(N-1)]+(0..2));
+  @ ensures \result != INCOMPLETE;
   @*/
 
 int minNum(char board[N][N], char player) {
