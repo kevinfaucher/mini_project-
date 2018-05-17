@@ -233,7 +233,7 @@ int coordTurn(char board[N][N], char player, int x, int y) {
 /*@
   @ requires \valid(board[0..(N-1)]+(0..2));
   @ assigns \nothing;
-  @ ensures \forall int i, j; 0<=i<=
+  @
   @*/
 int win_check(char board[N][N], char player) {
     int i, j;
