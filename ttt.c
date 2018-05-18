@@ -293,7 +293,6 @@ int coordTurn(char board[N][N], char player, int x, int y) {
   @ ensures \forall integer i; (board[i][0] == board[i][1] && board[i][1] == board[i][2]) ==> (board[i][0] != open_spot);
   @ ensures \forall integer diag; diag ==> (diag != FALSE);
   @*/
-  @*/
 int win_check(char board[N][N], char player) {
   int i, j;
   // For rows and columns
