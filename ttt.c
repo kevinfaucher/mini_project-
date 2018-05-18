@@ -132,7 +132,7 @@ void initialize(char board[N][N]) {
 	  @ loop variant N-j;
           @*/
         for (int j = 0; j < N; ++j) {
-            board[i][j] = open_spot;
+            board[i][j] = ' ';
         }
     }
 }
@@ -284,13 +284,23 @@ int coordTurn(char board[N][N], char player, int x, int y) {
     return FALSE;
 }
 
+
+
 /*@
   @ requires \valid_read(board[0..(N-1)]+(0..2));
   @ assigns \nothing;
-  @ ensures \forall integer i; (board[0][i] == player ? GAMEWIN : GAMELOSE) ==> (board[0][i] == board[1][i] && board[1][i] == board[2][i]);
-  @ ensures \forall integer i; (board[i][0] == player ? GAMEWIN : GAMELOSE) ==> (board[i][0] == board[i][1] && board[i][1] == board[i][2]);
-  @ ensures \forall integer i; (board[0][i] == board[1][i] && board[1][i] == board[2][i]) ==> (board[0][i] != open_spot);
-  @ ensures \forall integer i; (board[i][0] == board[i][1] && board[i][1] == board[i][2]) ==> (board[i][0] != open_spot);
+  @ ensures (board[0][0] != open_spot && board[0][0] == board[1][0] && board[1][0] == board[2][0]) && board[0][0] == player ==> GAMEWIN;
+  @ ensures (board[0][1] != open_spot && board[0][1] == board[1][1] && board[1][1] == board[2][1]) && board[0][1] == player ==> GAMEWIN;
+  @ ensures (board[0][2] != open_spot && board[0][2] == board[1][2] && board[1][2] == board[2][2]) && board[0][2] == player ==> GAMEWIN;
+  @ ensures (board[0][0] != open_spot && board[0][0] == board[1][0] && board[1][0] == board[2][0]) && board[0][0] != player ==> GAMELOSE;
+  @ ensures (board[0][1] != open_spot && board[0][1] == board[1][1] && board[1][1] == board[2][1]) && board[0][1] != player ==> GAMELOSE;
+  @ ensures (board[0][2] != open_spot && board[0][2] == board[1][2] && board[1][2] == board[2][2]) && board[0][2] != player ==> GAMELOSE;
+  @ ensures (board[0][0] != open_spot && board[0][0] == board[0][1] && board[0][1] == board[0][2]) && board[0][0] == player ==> GAMEWIN;
+  @ ensures (board[1][0] != open_spot && board[1][0] == board[1][1] && board[1][1] == board[1][2]) && board[1][0] == player ==> GAMEWIN;
+  @ ensures (board[2][0] != open_spot && board[2][0] == board[2][1] && board[2][1] == board[2][2]) && board[2][0] == player ==> GAMEWIN;
+  @ ensures (board[0][0] != open_spot && board[0][0] == board[0][1] && board[0][1] == board[0][2]) && board[0][0] != player ==> GAMELOSE;
+  @ ensures (board[1][0] != open_spot && board[1][0] == board[1][1] && board[1][1] == board[1][2]) && board[1][0] != player ==> GAMELOSE;
+  @ ensures (board[2][0] != open_spot && board[2][0] == board[2][1] && board[2][1] == board[2][2]) && board[2][0] != player ==> GAMELOSE;
   @ ensures \forall integer diag; diag ==> (diag != FALSE);
   @*/
 int win_check(char board[N][N], char player) {
