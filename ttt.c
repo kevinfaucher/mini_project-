@@ -8,8 +8,8 @@
 #define validCoord(x, y) ((x < 0 || x > N-1 || y < 0 || y > N-1) ? FALSE : TRUE)
 #define emptyBox(box) (box == ' ' ? TRUE : FALSE)
 #define OTHER(player) (player == playerX ? playerO : playerX)
-#define playerX 'X'
-#define playerO 'O'
+//#define playerX 'X'
+//#define playerO 'O'
 #define TRUE 1
 #define FALSE 0
 // #define open_spot ((char)' ')
@@ -20,7 +20,10 @@
 #define value_type char
 #define N 3
 
+const char playerX = 'X';
+const char playerO = 'O';
 const char open_spot=' ';
+int game_result = -15;
 
 // **Functions**
 void initialize(char board[N][N]);
@@ -58,6 +61,7 @@ bool end_game(int play);
   \forall int i; 0<=i<numRows ==> zeroed(&a[i][0], N);
  */
 
+
 // predicate zeroed2d{A}(char **a, integer n, integer m) =
 // \forall int i; 0<=i<n ==> zeroed(a[i], m);
 
@@ -65,11 +69,9 @@ bool end_game(int play);
   predicate
   HasValue(char* a, integer m, integer n, char v) =
   \exists integer i; m <= i < n && a[i] == v;
-
   predicate
   HasValue(char* a, integer n, char v) =
   HasValue(a, 0, n, v);
-
   predicate
   HasValue2d(char (*a)[N], integer numRows, char v) =
   \exists integer i; 0<=i<numRows && HasValue(&a[i][0], N, v);
@@ -80,19 +82,9 @@ bool end_game(int play);
   (\exists integer i; 0<=i<N && \forall integer j; 0<=j<N==>a[i][j]== p) ||
   (\exists integer i; 0<=i<N && \forall integer j; 0<=j<N==>a[j][i]== p) ||
   (\forall integer i; 0<=i<N==>a[i][i]==p) ||
-  (\forall integer j; 0<=j<N ==>a[j+2][j]==p && a[j][j]==p && a[j-2][j]);
+  (a[2][0]==p && a[1][1]==p && a[0][2]);
   @*/
 
-
-/*@
-  predicate Row_check(char (*a)[N], char p) =
-  (\exists integer i; 0<=i<N && \forall integer j; 0<=j<N==>a[i][j]== p);
-  @*/
-
-/*@
-  predicate Column_check(char (*a)[N], char p) =
-  (\exists integer i; 0<=i<N && \forall integer j; 0<=j<N==>a[j][i]== p);
-  @*/
 
 
 int main() {
@@ -216,7 +208,6 @@ int player_turn(char board[N][N], char player) {
 /*@
   @ requires \valid_read(board[0..(N-1)]+(0..2));
   @ assigns board[0.. (N-1) ][0..2];
-
   @ behavior box_area:
   		assumes boxArea(grid_var) == FALSE;
 		ensures \result == TRUE;
@@ -284,8 +275,6 @@ int coordTurn(char board[N][N], char player, int x, int y) {
     return FALSE;
 }
 
-
-
 /*@
   @ requires \valid_read(board[0..(N-1)]+(0..2));
   @ assigns \nothing;
@@ -340,6 +329,7 @@ int win_check(char board[N][N], char player) {
 }
 
 
+
 /*@
   @ requires \valid_read(board[0..(N-1)]+(0..2));
   @ assigns \nothing;
@@ -355,7 +345,6 @@ int win_check(char board[N][N], char player) {
   @ behavior right_false:
   		assumes board[2][0] != open_spot && board[2][0] == board[1][1] && board[1][1] == board[0][2] && board[2][0] != player;
 		ensures \result == GAMELOSE;
-
   @*/
 
 int diag_check(char board[N][N], char player){
@@ -411,12 +400,25 @@ int tie_check(char board[N][N]){
 }
 
 /*@
-  @ requires \valid_read(board[0..(N-1)]+(0..2));
-  @ assigns \nothing;
+  @ requires \valid(board[0..(N-1)]+(0..2));
+  @ assigns game_result, board[0.. (N-1) ][0..2];
+  @
+  @ behavior test:
+	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot;
+	   ensures \result == game_result;
+  @ behavior test2:
+	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot && Won(board,player);
+	   ensures game_result == GAMEWIN && \result == game_result ;
+  @ behavior test3:
+	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot && Won(board,player);
+	   ensures game_result == GAMELOSE && \result == game_result ;
+  @ behavior test4:
+	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot && !Won(board,playerX) && !Won(board, playerO);
+	   ensures game_result == GAMETIE && \result == game_result ;
+  @
   @*/
-
 int minNum(char board[N][N], char player) {
-    int game_result = win_check(board, OTHER(player));
+    game_result = win_check(board, OTHER(player));
 
     if (game_result != INCOMPLETE)
         return game_result;
@@ -448,12 +450,25 @@ int minNum(char board[N][N], char player) {
 }
 
 /*@
-  @ requires \valid_read(board[0..(N-1)]+(0..2));
-  @ assigns \nothing;
-  @ ensures \result >= -10;
+  @ requires \valid(board[0..(N-1)]+(0..2));
+  @ assigns game_result, board[0.. (N-1) ][0..2];
+  @
+  @ behavior test:
+	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot;
+	   ensures \result == game_result;
+  @ behavior test2:
+	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot && Won(board,player);
+	   ensures game_result == GAMEWIN && \result == game_result ;
+  @ behavior test3:
+	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot && Won(board,player);
+	   ensures game_result == GAMELOSE && \result == game_result ;
+  @ behavior test4:
+	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot && !Won(board,playerX) && !Won(board, playerO);
+	   ensures game_result == GAMETIE && \result == game_result ;
+  @
   @*/
 int maxNum(char board[N][N], char player) {
-    int game_result = win_check(board, player);
+    game_result = win_check(board, player);
     if (game_result != INCOMPLETE)
         return game_result;
 
@@ -521,14 +536,12 @@ void minimax(char board[N][N], char player) {
     /*@
       @ loop invariant minimax_first_loop: 0<=i<=N;
       @ loop assigns i, max,mval_i,mval_j;
-      @ loop invariant 0 <= i <= N;
 	  @ loop variant N-i;
       @*/
     for (int i = 0; i < N; ++i) {
         /*@
           @ loop invariant minimax_second_loop: 0<=i<=N && 0<=j<=N;
           @ loop assigns j, max,mval_i,mval_j;
-	  @ loop invariant 0 <= j <= N;
 		  @ loop variant N-j;
           @*/
         for (int j = 0; j < N; ++j) {
