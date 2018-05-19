@@ -186,11 +186,14 @@ int comp_turn(char board[N][N], char player) {
 // Player's turn
 
 /*@
-  @ requires \valid_read(board[0..(N-1)]+(0.. (N-1)));
-  @ assigns \nothing;
+  @ requires \valid(board[0..(N-1)]+(0.. (N-1)));
+  @ assigns board[0.. (N-1) ][0..2], game_result;
   @*/
 int player_turn(char board[N][N], char player) {
     int grid_var;
+	/*@
+	  @ loop assigns grid_var, board[0.. (N-1) ][0..2], game_result;
+	  @*/
     while (TRUE) {
         //printf("Enter number: "); // Allows the user to pick a spot according to the diagram
         //scanf("%d", &grid_var);
