@@ -2,7 +2,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdbool.h>
-//#include "HasValue.h"
 
 #define boxArea(box) (box >= 1 && box <= 9 ? TRUE : FALSE)
 #define validCoord(x, y) ((x < 0 || x > N-1 || y < 0 || y > N-1) ? FALSE : TRUE)
@@ -105,7 +104,7 @@ int main() {
 // Initialize board
 
 /*@
-  @ requires \valid(board[0..(N-1)]+(0..2));
+  @ requires \valid(board[0..(N-1)]+(0.. (N-1)));
   @ assigns board[0.. (N-1) ][0..2];
   @ ensures zeroed2d(board,N);
   @*/
@@ -129,7 +128,7 @@ void initialize(char board[N][N]) {
     }
 }
 
-/*@ requires \valid(board[0..(N-1)]+(0..2));
+/*@ requires \valid(board[0..(N-1)]+(0.. (N-1)));
   @ assigns board[0..(N-1)][0..2];
   @*/
 void print_board(char board[N][N]) {
@@ -169,7 +168,10 @@ bool end_game(int play) {
 
 }
 
-
+/*@
+  @ requires \valid(board[0..(N-1)]+(0.. (N-1)));
+  @ assigns board[0.. (N-1) ][0..2], game_result;
+  @*/
 int comp_turn(char board[N][N], char player) {
     //printf("\t\t\tComputer's turn\n");
 
@@ -184,7 +186,7 @@ int comp_turn(char board[N][N], char player) {
 // Player's turn
 
 /*@
-  @ requires \valid_read(board[0..(N-1)]+(0..2));
+  @ requires \valid_read(board[0..(N-1)]+(0.. (N-1)));
   @ assigns \nothing;
   @*/
 int player_turn(char board[N][N], char player) {
@@ -206,7 +208,7 @@ int player_turn(char board[N][N], char player) {
 }
 
 /*@
-  @ requires \valid_read(board[0..(N-1)]+(0..2));
+  @ requires \valid(board[0..(N-1)]+(0.. (N-1)));
   @ assigns board[0.. (N-1) ][0..2];
   @ behavior box_area:
   		assumes boxArea(grid_var) == FALSE;
@@ -331,7 +333,7 @@ int win_check(char board[N][N], char player) {
 
 
 /*@
-  @ requires \valid_read(board[0..(N-1)]+(0..2));
+  @ requires \valid_read(board[0..(N-1)]+(0.. (N-1)));
   @ assigns \nothing;
   @ behavior left_true:
   		assumes board[0][0] != open_spot && board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] == player;
@@ -400,8 +402,8 @@ int tie_check(char board[N][N]){
 }
 
 /*@
-  @ requires \valid(board[0..(N-1)]+(0..2));
-  @ assigns game_result, board[0.. (N-1) ][0..2];
+  @ requires \valid(board[0..(N-1)]+(0.. (N-1)));
+  @ assigns func_min_assign: game_result, board[0.. (N-1) ][0..2];
   @
   @ behavior test:
 	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot;
@@ -426,13 +428,13 @@ int minNum(char board[N][N], char player) {
     int min = 10;
   /*@
     @ loop invariant 0<=i<=N;
-    @ loop assigns i, min;
+    @ loop assigns i, min, game_result;
     @ loop variant N-i;
     @*/
   for (int i = 0; i < N; ++i) {
     /*@
       @ loop invariant 0<=i<=N && 0<=j<=N;
-      @ loop assigns j, min;
+      @ loop assigns j, min, game_result;
       @ loop variant N-j;
       @*/
         for (int j = 0; j < N; ++j) {
@@ -450,8 +452,8 @@ int minNum(char board[N][N], char player) {
 }
 
 /*@
-  @ requires \valid(board[0..(N-1)]+(0..2));
-  @ assigns game_result, board[0.. (N-1) ][0..2];
+  @ requires \valid(board[0..(N-1)]+(0.. (N-1)));
+  @ assigns funct_assign: game_result, board[0.. (N-1) ][0..2];
   @
   @ behavior test:
 	   assumes \forall int i, j; 0<=j<=i<=N && board[i][j] != open_spot;
@@ -474,14 +476,14 @@ int maxNum(char board[N][N], char player) {
 
     int max = -10;
 	/*@
-	  @ loop invariant 0<=i<=N;
-	  @ loop assigns i, max;
+	  @ loop invariant outerloop: 0<=i<=N;
+	  @ loop assigns outer_assign: i, max, game_result;
 	  @ loop variant N-i;
 	  @*/
     for (int i = 0; i < N; ++i) {
 		/*@
-		  @ loop invariant 0<=i<=N && 0<=j<=N;
-	      @ loop assigns j, max;
+		  @ loop invariant inner_loop: 0<=i<=N && 0<=j<=N;
+	      @ loop assigns inner_assign: j, max, game_result;
 	      @ loop variant N-j;
 	      @*/
         for (int j = 0; j < N; ++j) {
@@ -499,14 +501,15 @@ int maxNum(char board[N][N], char player) {
 }
 
 /*@
+  @ requires \valid_read(board[0..(N-1)]+(0..2));
   @ requires \valid(new_board[0..(N-1)]+(0..2));
   @ assigns new_board[0.. (N-1) ][0..2];
-  @ ensures \forall int i,j; 0<=j<=i<=N ==> new_board[i][j] == board[i][j];
+  @ ensures \forall int i,j; 0<=i<=N && 0<=j<=N ==> new_board[i][j] == board[i][j];
   @*/
 void new_board_check(char board[N][N], char new_board[N][N]){
   /*@
     @ loop invariant 0<=x<=N;
-    @ loop assigns x;
+    @ loop assigns x, new_board[0.. (N-1) ][0..2];
     @ loop variant N-x;
     @*/
   for (int x = 0; x < N; ++x) {
@@ -522,11 +525,9 @@ void new_board_check(char board[N][N], char new_board[N][N]){
 
 }
 
-
-
-
 /*@
-  @ requires \valid_read(board[0..(N-1)]+(0..2));
+  @ requires \valid(board[0..(N-1)]+(0.. (N-1)));
+  @ assigns board[0.. (N-1) ][0..2], game_result;
   @*/
 
 void minimax(char board[N][N], char player) {
@@ -535,13 +536,13 @@ void minimax(char board[N][N], char player) {
     max = -10;
     /*@
       @ loop invariant minimax_first_loop: 0<=i<=N;
-      @ loop assigns i, max,mval_i,mval_j;
+      @ loop assigns i, max,mval_i,mval_j, game_result;
 	  @ loop variant N-i;
       @*/
     for (int i = 0; i < N; ++i) {
         /*@
           @ loop invariant minimax_second_loop: 0<=i<=N && 0<=j<=N;
-          @ loop assigns j, max,mval_i,mval_j;
+          @ loop assigns j, max,mval_i,mval_j, game_result;
 		  @ loop variant N-j;
           @*/
         for (int j = 0; j < N; ++j) {
